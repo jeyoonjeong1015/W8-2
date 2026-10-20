@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Read & Grammar</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFF8EE; --card:#FFFFFF; --ink:#2B2D42; --muted:#6B6F80; --line:#EFE6D8;
+    --primary:#FF7A59; --hl:#FFE066; --hl-edge:#F2C200;
+    --ok:#2FA866; --ok-bg:#E7F8EF; --bad:#D93B30; --bad-bg:#FFECEB;
+    --soft:#F5F0E8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg)}
+  body{font-family:'Nunito','Noto Sans KR',sans-serif;color:var(--ink);min-height:100vh;-webkit-tap-highlight-color:transparent}
+  button{font:inherit;color:inherit}
+  .app{max-width:760px;margin:0 auto;padding:0 16px 56px}
+
+  /* Top bar */
+  .topbar{display:flex;align-items:center;gap:12px;padding:16px 0}
+  .brand{font-weight:900;font-size:1.2rem;display:flex;align-items:center;gap:8px}
+  .brand .logo{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:12px;background:var(--primary);color:#fff;font-size:1.1rem}
+  .spacer{flex:1}
+  .home-btn{border:2px solid var(--line);background:#fff;border-radius:12px;width:40px;height:40px;cursor:pointer;font-size:1.1rem}
+  .home-btn:hover{background:var(--soft)}
+
+  /* Home */
+  .hero{background:linear-gradient(135deg,#FF9A76,#FF7A59);color:#fff;border-radius:26px;padding:26px 24px;margin-bottom:24px;box-shadow:0 12px 30px rgba(255,122,89,.25)}
+  .hero h1{font-size:1.7rem;font-weight:900;letter-spacing:-.5px}
+  .hero p{margin-top:8px;line-height:1.7;opacity:.96}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .flow span{background:rgba(255,255,255,.22);padding:6px 12px;border-radius:999px;font-weight:800;font-size:.88rem}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 12px}
+  .sec-head h2{font-size:1.2rem;font-weight:900}
+  .total{font-weight:800;color:var(--muted)}
+  .lesson-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+  .lesson-card{position:relative;overflow:hidden;text-align:left;background:#fff;border:2px solid var(--line);border-radius:22px;padding:18px 18px 16px 22px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+  .lesson-card:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(0,0,0,.08)}
+  .lesson-card .bar{position:absolute;left:0;top:0;bottom:0;width:7px;background:var(--c)}
+  .lesson-card .emoji{font-size:2rem}
+  .lnum{margin-top:6px;font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .ltitle{font-size:1.15rem;font-weight:900;margin-top:2px}
+  .chip{display:inline-block;margin-top:8px;padding:4px 10px;border-radius:999px;font-size:.8rem;font-weight:800;color:var(--c);background:var(--cbg)}
+  .lko{margin-top:6px;font-size:.85rem;color:var(--muted)}
+  .stars{margin-top:10px;font-size:1.15rem;letter-spacing:2px}
+  .star-on{color:#FFB800}
+  .star-off{color:#DDD3C4}
+
+  /* Lesson */
+  .lesson-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .lesson-head .emoji{font-size:2.2rem;width:56px;height:56px;border-radius:18px;display:grid;place-items:center;background:var(--cbg)}
+  .lesson-head .lnum{margin-top:0}
+  .lesson-head .ltitle{font-size:1.3rem}
+  .stepper{display:flex;gap:6px;margin:6px 0 18px}
+  .step{flex:1;text-align:center;font-size:.82rem;font-weight:800;padding:9px 4px;border-radius:12px;background:#fff;border:2px solid var(--line);color:var(--muted);cursor:pointer;transition:background .15s}
+  .step .n{display:block;font-size:.7rem;opacity:.8}
+  .step.done{border-color:var(--c);color:var(--c)}
+  .step.active{background:var(--c);border-color:var(--c);color:#fff}
+  .step.locked{opacity:.45;cursor:not-allowed}
+
+  .card{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:22px;margin-bottom:16px}
+  .card-label{font-size:.8rem;font-weight:900;color:var(--c);letter-spacing:.5px;margin-bottom:8px}
+  .ptitle{font-size:1.45rem;font-weight:900;margin-bottom:12px}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .btn{border:none;border-radius:14px;padding:10px 16px;cursor:pointer;background:var(--soft);font-weight:800;font-size:.95rem;transition:transform .1s,background .15s}
+  .btn:hover{filter:brightness(.97)}
+  .btn:active{transform:scale(.97)}
+  .btn.on{background:var(--ink);color:#fff}
+  .btn.primary{background:var(--c);color:#fff}
+  .btn.big{padding:14px 22px;font-size:1.05rem;border-radius:16px}
+  .btn.ghost{background:#fff;border:2px solid var(--line)}
+
+  .passage{font-size:1.28rem;line-height:2.15;font-weight:600;word-break:keep-all}
+  .w{cursor:pointer;border-radius:7px;padding:2px 2px;transition:background .15s,box-shadow .15s}
+  .w:hover{background:var(--soft)}
+  .w.t.hl{background:var(--hl);box-shadow:inset 0 -3px 0 var(--hl-edge);font-weight:800}
+  .w.t.found{background:#C8F2DA;color:#137A43;box-shadow:inset 0 -3px 0 var(--ok);font-weight:800}
+  .w.wrong{background:#FFD5D3;animation:shake .35s}
+  .w.hint{animation:pulse 1.1s ease 2;background:#FFF3B0}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(242,194,0,.0)}50%{box-shadow:0 0 0 6px rgba(242,194,0,.45)}}
+  .w{display:inline-block}
+
+  .ko{margin-top:16px;padding:14px 16px;background:var(--soft);border-radius:16px;color:var(--muted);line-height:1.85;font-size:.98rem}
+  .note{margin-top:16px;padding:13px 15px;border-radius:16px;background:#FFF9E3;border:2px dashed var(--hl-edge);font-weight:700;line-height:1.6;font-size:.95rem}
+  .note b{font-size:1.05rem}
+
+  .nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:4px}
+
+  /* Grammar */
+  .gko{color:var(--muted);font-weight:700;margin-top:-6px;margin-bottom:14px}
+  .formula{font-size:1.45rem;font-weight:900;text-align:center;padding:18px 12px;border-radius:18px;background:var(--cbg);color:var(--c)}
+  .summary{margin:16px 0 6px;font-weight:700;line-height:1.7;font-size:1.02rem}
+  .rule-row{display:grid;grid-template-columns:150px 1fr;gap:4px 14px;padding:13px 0;border-bottom:1px dashed var(--line);align-items:baseline}
+  .rule-row:last-child{border-bottom:none}
+  .rlabel{font-weight:800;color:var(--muted);font-size:.92rem}
+  .rform{font-weight:900;color:var(--c)}
+  .rex{grid-column:2/3;color:var(--ink);font-weight:600;font-size:.98rem}
+  .tip{margin-top:14px;background:#E8F7F6;color:#1F6F6A;border-radius:16px;padding:14px 16px;font-weight:700;line-height:1.6}
+  .ex-list{list-style:none;display:grid;gap:10px}
+  .ex-list li{display:flex;gap:10px;align-items:flex-start;font-size:1.12rem;font-weight:600;line-height:1.7}
+  .ex-list mark{background:var(--hl);box-shadow:inset 0 -3px 0 var(--hl-edge);border-radius:6px;padding:0 3px;font-weight:800;color:inherit}
+  .say{border:none;background:var(--soft);border-radius:10px;width:36px;height:36px;flex:none;cursor:pointer;font-size:1rem}
+  .say:hover{background:var(--line)}
+
+  /* Find */
+  .guide{font-weight:700;margin-bottom:12px;line-height:1.6}
+  .find-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  .counter{font-weight:800;color:var(--muted)}
+  .counter b{color:var(--c);font-size:1.3rem}
+  .dots{display:flex;gap:5px;margin-top:6px}
+  .dots i{width:12px;height:12px;border-radius:50%;background:var(--line);display:block}
+  .dots i.on{background:var(--ok)}
+  .success{margin-top:16px;padding:14px 16px;border-radius:16px;background:var(--ok-bg);color:#137A43;font-weight:800}
+
+  /* Quiz */
+  .qhead{display:flex;justify-content:space-between;font-weight:800;color:var(--muted);font-size:.9rem}
+  .qprog{height:10px;background:var(--soft);border-radius:999px;margin:8px 0 20px;overflow:hidden}
+  .qprog div{height:100%;background:var(--c);border-radius:999px;transition:width .3s}
+  .question{font-size:1.35rem;font-weight:800;line-height:1.7}
+  .blank{display:inline-block;min-width:90px;border-bottom:3px solid var(--c);text-align:center;color:var(--c);padding:0 6px}
+  .blank.filled{background:var(--ok-bg);color:#137A43;border-color:var(--ok);border-radius:8px 8px 0 0}
+  .opts{display:grid;gap:10px;margin-top:20px}
+  .opt{text-align:left;padding:15px 18px;border-radius:16px;border:2px solid var(--line);background:#fff;cursor:pointer;font-size:1.1rem;font-weight:700;transition:border-color .15s,background .15s}
+  .opt:hover:not(:disabled){border-color:var(--c);background:var(--cbg)}
+  .opt:disabled{cursor:default}
+  .opt.correct{border-color:var(--ok);background:var(--ok-bg);color:#137A43}
+  .opt.correct::after{content:"  ✓"}
+  .opt.incorrect{border-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+  .opt.incorrect::after{content:"  ✗"}
+  .feedback{margin-top:16px;padding:15px 16px;border-radius:16px;line-height:1.65}
+  .feedback.ok{background:var(--ok-bg);color:#137A43}
+  .feedback.bad{background:var(--bad-bg);color:#9E2A21}
+  .feedback p{margin-top:4px;font-weight:600;color:var(--ink)}
+  .full{display:flex;align-items:center;gap:10px;margin-top:10px;font-weight:700;color:var(--ink)}
+
+  /* Result */
+  .result{text-align:center;padding:30px 22px}
+  .big-stars{font-size:3rem;letter-spacing:6px}
+  .result h2{font-size:1.6rem;font-weight:900;margin-top:8px}
+  .score{font-size:1.2rem;font-weight:800;color:var(--c);margin-top:8px}
+  .sub{color:var(--muted);font-weight:700;margin-top:6px}
+  .review{list-style:none;display:grid;gap:10px}
+  .review li{padding:12px 14px;border-radius:14px;background:var(--soft);line-height:1.65}
+  .review .q{font-weight:800}
+  .review .mine{color:var(--bad);font-weight:700}
+  .review .ans{color:#137A43;font-weight:800}
+  .result-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+
+  @media (max-width:520px){
+    .hero h1{font-size:1.45rem}
+    .passage{font-size:1.14rem;line-height:2.05}
+    .question{font-size:1.18rem}
+    .step{font-size:.72rem;padding:8px 2px}
+    .rule-row{grid-template-columns:1fr}
+    .rex{grid-column:1/-1}
+    .formula{font-size:1.2rem}
+    .card{padding:18px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <button class="home-btn" id="homeBtn" aria-label="레슨 목록으로">🏠</button>
+    <div class="brand"><span class="logo">📖</span>Read &amp; Grammar</div>
+    <div class="spacer"></div>
+  </header>
+  <main id="view"></main>
+</div>
+
+<script>
+/* =========================================================
+   LESSON DATA
+   - [[ ]] 안의 표현이 오늘의 문법(찾기 대상)입니다.
+   - notes의 key는 [[ ]] 안 표현의 소문자 형태입니다.
+   ========================================================= */
+const LESSONS = [
+  {
+    id: "past", emoji: "🌧️", color: "#5B8DEF",
+    title: "A Rainy Saturday",
+    grammar: "Past Simple (-ed)", grammarKo: "과거시제 · 규칙동사 -ed",
+    passage: "Last Saturday, it [[rained]] all day. Mina [[stayed]] at home with her little brother. They [[played]] a board game in the living room. Then they [[baked]] cookies with Mom. The kitchen [[smelled]] sweet. In the evening, they [[watched]] a funny movie and [[laughed]] a lot. Mina [[loved]] that rainy day.",
+    ko: "지난 토요일, 하루 종일 비가 왔어요. 미나는 남동생과 함께 집에 있었어요. 둘은 거실에서 보드게임을 했어요. 그다음 엄마와 함께 쿠키를 구웠어요. 부엌에서 달콤한 냄새가 났어요. 저녁에는 재미있는 영화를 보며 많이 웃었어요. 미나는 그 비 오는 날이 정말 좋았어요.",
+    notes: {
+      "rained": "rain + -ed → 비가 왔다",
+      "stayed": "stay + -ed → 머물렀다",
+      "played": "play + -ed → 놀았다, (게임을) 했다",
+      "baked": "bake + -d → 구웠다 (e로 끝나서 -d만 붙여요)",
+      "smelled": "smell + -ed → 냄새가 났다",
+      "watched": "watch + -ed → 보았다",
+      "laughed": "laugh + -ed → 웃었다",
+      "loved": "love + -d → 아주 좋아했다 (e로 끝나서 -d만 붙여요)"
+    },
+    rule: {
+      formula: "동사 + -ed",
+      summary: "이미 끝난 과거의 일을 말할 때 동사 뒤에 -ed를 붙여요.",
+      points: [
+        ["대부분의 동사", "+ -ed", "play → played, watch → watched"],
+        ["-e로 끝나는 동사", "+ -d", "bake → baked, love → loved"],
+        ["자음 + y로 끝나는 동사", "y → i + -ed", "study → studied, cry → cried"],
+        ["단모음 + 단자음", "자음 한 번 더 + -ed", "stop → stopped, plan → planned"]
+      ],
+      tip: "yesterday, last Saturday, ago 같은 말이 보이면 과거시제 신호예요!"
+    },
+    findGuide: "글에서 과거시제 동사(-ed)를 모두 찾아 눌러 보세요.",
+    quiz: [
+      { q: "Yesterday, I ___ my room.", options: ["clean", "cleaned", "cleaning"], answer: "cleaned", explain: "yesterday(어제)는 과거 신호! clean + -ed = cleaned" },
+      { q: "We ___ soccer after school last Monday.", options: ["play", "plays", "played"], answer: "played", explain: "last Monday(지난 월요일) → 과거. play + -ed = played" },
+      { q: "She ___ hard for the test last night.", options: ["studyed", "studied", "studies"], answer: "studied", explain: "자음 + y로 끝나면 y를 i로 바꾸고 -ed: study → studied" },
+      { q: "The bus ___ in front of the school a minute ago.", options: ["stoped", "stopped", "stops"], answer: "stopped", explain: "stop은 단모음 + 단자음이라 p를 한 번 더 써요: stopped" },
+      { q: "Which sentence is correct?", options: ["He watch TV last night.", "He watched TV last night.", "He watching TV last night."], answer: "He watched TV last night.", explain: "last night(어젯밤)은 과거이므로 watched를 써요." }
+    ]
+  },
+  {
+    id: "progressive", emoji: "🌳", color: "#FF7A59",
+    title: "At the Park",
+    grammar: "Present Progressive", grammarKo: "현재진행형 · am/is/are + -ing",
+    passage: "It is a sunny afternoon. Many people [[are enjoying]] the park. A man [[is walking]] his dog. Two girls [[are riding]] their bikes. A baby [[is sleeping]] under a tree. I [[am sitting]] on a bench, and I [[am eating]] an ice cream. Everyone looks happy.",
+    ko: "화창한 오후예요. 많은 사람들이 공원을 즐기고 있어요. 한 남자가 개를 산책시키고 있어요. 두 여자아이가 자전거를 타고 있어요. 아기가 나무 아래에서 자고 있어요. 나는 벤치에 앉아서 아이스크림을 먹고 있어요. 모두 행복해 보여요.",
+    notes: {
+      "are enjoying": "are + enjoying → 즐기고 있다 (주어: Many people, 여럿)",
+      "is walking": "is + walking → 산책시키고 있다 (주어: A man, 한 명)",
+      "are riding": "are + riding → 타고 있다 (ride의 e를 빼고 -ing)",
+      "is sleeping": "is + sleeping → 자고 있다 (주어: A baby, 한 명)",
+      "am sitting": "am + sitting → 앉아 있다 (sit의 t를 한 번 더)",
+      "am eating": "am + eating → 먹고 있다 (주어: I)"
+    },
+    rule: {
+      formula: "am / is / are + 동사-ing",
+      summary: "지금 이 순간 하고 있는 일을 말할 때 써요. '~하고 있어요'라는 뜻이에요.",
+      points: [
+        ["I", "am + -ing", "I am reading."],
+        ["He / She / It (하나)", "is + -ing", "She is running."],
+        ["We / You / They (여럿)", "are + -ing", "They are playing."],
+        ["-e로 끝나는 동사", "e 빼고 + -ing", "ride → riding, make → making"],
+        ["단모음 + 단자음", "자음 한 번 더 + -ing", "sit → sitting, swim → swimming"]
+      ],
+      tip: "now, right now, Look!, Listen! 이 보이면 현재진행형 신호예요!"
+    },
+    findGuide: "글에서 'am/is/are + -ing' 표현을 모두 찾아 눌러 보세요.",
+    quiz: [
+      { q: "Look! The cat ___ on the sofa.", options: ["is sleeping", "are sleeping", "sleeping"], answer: "is sleeping", explain: "The cat은 한 마리 → is + sleeping" },
+      { q: "They ___ a song now.", options: ["is singing", "are singing", "am singing"], answer: "are singing", explain: "They(여럿) → are + singing" },
+      { q: "I ___ my homework right now.", options: ["am doing", "is doing", "doing"], answer: "am doing", explain: "I는 항상 am과 함께! am + doing" },
+      { q: "He is ___ in the pool.", options: ["swiming", "swimming", "swimmming"], answer: "swimming", explain: "swim은 단모음 + 단자음 → m을 한 번 더: swimming" },
+      { q: "Which sentence is correct?", options: ["She are reading a book.", "She is reading a book.", "She reading a book."], answer: "She is reading a book.", explain: "She(한 명) → is가 필요하고, be동사를 빼면 안 돼요." }
+    ]
+  },
+  {
+    id: "comparative", emoji: "🐶", color: "#9B6BF2",
+    title: "My Two Pets",
+    grammar: "Comparatives", grammarKo: "비교급 · -er / more + than",
+    passage: "I have two pets, a dog named Max and a cat named Luna. Max is [[bigger]] than Luna, but Luna is [[older]]. Max is [[faster]] than Luna in the yard. Luna is [[quieter]] than Max, so she is good at hiding. Max thinks his food is [[more delicious]] than Luna's food. To me, they are both cute!",
+    ko: "나는 반려동물이 두 마리 있어요. 맥스라는 개와 루나라는 고양이예요. 맥스는 루나보다 크지만, 루나가 나이가 더 많아요. 마당에서는 맥스가 루나보다 빨라요. 루나는 맥스보다 조용해서 숨기를 잘해요. 맥스는 자기 사료가 루나의 사료보다 더 맛있다고 생각해요. 내 눈에는 둘 다 귀여워요!",
+    notes: {
+      "bigger": "big → bigger (g를 한 번 더 쓰고 -er)",
+      "older": "old + -er → 나이가 더 많은",
+      "faster": "fast + -er → 더 빠른",
+      "quieter": "quiet + -er → 더 조용한",
+      "more delicious": "delicious는 긴 단어 → more + delicious"
+    },
+    rule: {
+      formula: "형용사-er / more + 형용사 + than",
+      summary: "두 가지를 비교해서 '~보다 더 …해요'라고 말할 때 써요.",
+      points: [
+        ["짧은 형용사", "+ -er", "tall → taller, fast → faster"],
+        ["-e로 끝나는 형용사", "+ -r", "nice → nicer, large → larger"],
+        ["단모음 + 단자음", "자음 한 번 더 + -er", "big → bigger, hot → hotter"],
+        ["자음 + y로 끝나는 형용사", "y → i + -er", "happy → happier, easy → easier"],
+        ["긴 형용사", "more + 형용사", "more delicious, more beautiful"],
+        ["불규칙", "모양이 바뀌어요", "good → better, bad → worse"]
+      ],
+      tip: "than(~보다) 앞에 비교급이 와요!"
+    },
+    findGuide: "글에서 비교급 표현(-er / more ~)을 모두 찾아 눌러 보세요.",
+    quiz: [
+      { q: "An elephant is ___ than a mouse.", options: ["big", "bigger", "more big"], answer: "bigger", explain: "big은 단모음 + 단자음 → g를 한 번 더: bigger" },
+      { q: "This book is ___ than that one.", options: ["interestinger", "more interesting", "interesting"], answer: "more interesting", explain: "interesting은 긴 단어 → more + interesting" },
+      { q: "My sister is ___ than me.", options: ["happyer", "happier", "more happy"], answer: "happier", explain: "자음 + y → y를 i로 바꾸고 -er: happier" },
+      { q: "Today is ___ than yesterday.", options: ["hot", "hoter", "hotter"], answer: "hotter", explain: "hot은 단모음 + 단자음 → t를 한 번 더: hotter" },
+      { q: "Your idea is ___ than mine.", options: ["gooder", "better", "more good"], answer: "better", explain: "good의 비교급은 불규칙! good → better" }
+    ]
+  },
+  {
+    id: "can", emoji: "🤖", color: "#2FB39A",
+    title: "Super Robot Bobo",
+    grammar: "Can / Can't", grammarKo: "조동사 can · 할 수 있다 / 없다",
+    passage: "Bobo is a robot. He [[can speak]] three languages. He [[can carry]] heavy boxes, and he [[can cook]] spaghetti. But Bobo [[can't swim]]. Water is dangerous for robots! He also [[can't sing]] well. His voice sounds funny. Still, everyone loves Bobo.",
+    ko: "보보는 로봇이에요. 보보는 세 가지 언어를 말할 수 있어요. 무거운 상자를 옮길 수 있고, 스파게티도 요리할 수 있어요. 하지만 보보는 수영을 못 해요. 물은 로봇에게 위험하거든요! 노래도 잘 못 불러요. 목소리가 웃기게 들려요. 그래도 모두가 보보를 사랑해요.",
+    notes: {
+      "can speak": "can + speak(동사원형) → 말할 수 있다",
+      "can carry": "can + carry(동사원형) → 옮길 수 있다",
+      "can cook": "can + cook(동사원형) → 요리할 수 있다",
+      "can't swim": "can't(= cannot) + swim → 수영할 수 없다",
+      "can't sing": "can't(= cannot) + sing → 노래를 (잘) 못 한다"
+    },
+    rule: {
+      formula: "can / can't + 동사원형",
+      summary: "할 수 있는 일(능력)은 can, 할 수 없는 일은 can't로 말해요.",
+      points: [
+        ["긍정", "can + 동사원형", "I can swim."],
+        ["부정", "can't (cannot) + 동사원형", "He can't cook."],
+        ["의문문", "Can + 주어 + 동사원형?", "Can you dance? — Yes, I can. / No, I can't."],
+        ["주의!", "주어가 He/She여도 그대로", "She can sing. (✕ cans, ✕ can sings)"]
+      ],
+      tip: "can 뒤에는 언제나 동사원형! -s, -ed, -ing를 붙이지 않아요."
+    },
+    findGuide: "글에서 'can / can't + 동사' 표현을 모두 찾아 눌러 보세요.",
+    quiz: [
+      { q: "My dad ___ fix bikes.", options: ["can", "cans", "is can"], answer: "can", explain: "can은 주어가 He/She여도 모양이 바뀌지 않아요." },
+      { q: "Birds can ___.", options: ["fly", "flies", "flying"], answer: "fly", explain: "can 뒤에는 항상 동사원형! can fly" },
+      { q: "Penguins ___ fly, but they can swim.", options: ["can", "can't", "don't can"], answer: "can't", explain: "펭귄은 날 수 없어요 → can't + fly" },
+      { q: "___ you play the piano? — Yes, I can.", options: ["Do", "Can", "Are"], answer: "Can", explain: "대답이 'Yes, I can.'이므로 질문도 Can으로 시작해요." },
+      { q: "Which sentence is correct?", options: ["She cans dance.", "She can dance.", "She can dances."], answer: "She can dance.", explain: "can + 동사원형. can에도, 동사에도 -s를 붙이지 않아요." }
+    ]
+  },
+  {
+    id: "there", emoji: "🏫", color: "#E8962A",
+    title: "My Classroom",
+    grammar: "There is / There are", grammarKo: "There is / are · ~이 있다",
+    passage: "Welcome to my classroom! [[There is]] a big whiteboard at the front. [[There are]] twenty desks in the room. [[There is]] a clock on the wall. [[There are]] many books on the shelf. [[There isn't]] a TV, but [[there is]] a computer. I like my classroom.",
+    ko: "우리 교실에 온 걸 환영해요! 앞쪽에 큰 화이트보드가 있어요. 교실에는 책상이 스무 개 있어요. 벽에는 시계가 하나 있어요. 책장에는 책이 많이 있어요. TV는 없지만 컴퓨터는 있어요. 나는 우리 교실이 좋아요.",
+    notes: {
+      "there is": "There is + 단수 명사 → (하나) 있다",
+      "there are": "There are + 복수 명사 → (여럿) 있다",
+      "there isn't": "There isn't = There is not → 없다"
+    },
+    rule: {
+      formula: "There is + 단수 / There are + 복수",
+      summary: "'~이 있어요'라고 말할 때 써요. 뒤에 오는 명사의 개수가 중요해요.",
+      points: [
+        ["하나 (단수)", "There is + a/an + 명사", "There is a clock."],
+        ["여럿 (복수)", "There are + 복수 명사", "There are twenty desks."],
+        ["셀 수 없는 명사", "There is + 명사", "There is some water."],
+        ["부정 (없어요)", "There isn't / There aren't", "There isn't a TV."],
+        ["의문문", "Is there ~? / Are there ~?", "Is there a pen? — Yes, there is."]
+      ],
+      tip: "is와 are는 뒤에 오는 명사의 개수를 보고 정해요!"
+    },
+    findGuide: "글에서 'There is / There are' 표현을 모두 찾아 눌러 보세요.",
+    quiz: [
+      { q: "___ a cat under the table.", options: ["There is", "There are"], answer: "There is", explain: "a cat(한 마리) → There is" },
+      { q: "___ three apples in the basket.", options: ["There is", "There are"], answer: "There are", explain: "three apples(여러 개) → There are" },
+      { q: "___ some milk in the fridge.", options: ["There is", "There are"], answer: "There is", explain: "milk는 셀 수 없는 명사 → There is" },
+      { q: "There ___ any cookies left.", options: ["isn't", "aren't"], answer: "aren't", explain: "cookies(복수) → There aren't" },
+      { q: "___ a park near your house? — Yes, there is.", options: ["Is there", "Are there", "There is"], answer: "Is there", explain: "의문문은 Is there ~? 대답이 'there is'이므로 단수예요." }
+    ]
+  }
+];
+
+/* =========================================================
+   STATE & STORAGE
+   ========================================================= */
+const STEPS = ["읽기", "문법", "찾기", "연습", "결과"];
+const STORE_KEY = "readGrammarProgress_v1";
+const view = document.getElementById("view");
+const homeBtn = document.getElementById("homeBtn");
+
+let S = { view: "home" };
+
+function loadProg() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; }
+}
+function saveProg(p) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(p)); } catch (e) {}
+}
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function plain(text) { return text.replace(/\[\[(.*?)\]\]/g, "$1"); }
+function starHTML(n) {
+  let h = "";
+  for (let i = 0; i < 3; i++) h += i < n ? '<span class="star-on">★</span>' : '<span class="star-off">★</span>';
+  return h;
+}
+function calcStars(c, n) {
+  if (c === n) return 3;
+  if (c >= n - 2) return 2;
+  if (c >= 1) return 1;
+  return 0;
+}
+
+/* Passage tokenizer */
+function parsePassage(text) {
+  const tokens = [];
+  let tIdx = 0;
+  text.split(/(\[\[.*?\]\])/).forEach(part => {
+    if (!part) return;
+    if (part.startsWith("[[")) {
+      tokens.push({ type: "t", text: part.slice(2, -2), idx: tIdx++ });
+      return;
+    }
+    part.split(/(\s+)/).forEach(chunk => {
+      if (!chunk) return;
+      if (/^\s+$/.test(chunk)) { tokens.push({ type: "s", text: chunk }); return; }
+      const m = chunk.match(/^([^A-Za-z']*)([A-Za-z']+)([^A-Za-z']*)$/);
+      if (m) {
+        if (m[1]) tokens.push({ type: "p", text: m[1] });
+        tokens.push({ type: "w", text: m[2] });
+        if (m[3]) tokens.push({ type: "p", text: m[3] });
+      } else {
+        tokens.push({ type: "p", text: chunk });
+      }
+    });
+  });
+  return { tokens, count: tIdx };
+}
+
+function passageHTML(mode) {
+  const L = LESSONS[S.li];
+  const { tokens } = parsePassage(L.passage);
+  return tokens.map(t => {
+    if (t.type === "w") return `<span class="w" data-w="${esc(t.text)}">${esc(t.text)}</span>`;
+    if (t.type === "t") {
+      let cls = "w t";
+      if (mode === "read" && S.hl) cls += " hl";
+      if (mode === "find" && S.found.has(t.idx)) cls += " found";
+      return `<span class="${cls}" data-t="${t.idx}" data-w="${esc(t.text)}">${esc(t.text)}</span>`;
+    }
+    return esc(t.text);
+  }).join("");
+}
+
+/* =========================================================
+   SPEECH (Text-to-Speech)
+   ========================================================= */
+let voices = [];
+const canSpeak = "speechSynthesis" in window;
+function loadVoices() { try { voices = speechSynthesis.getVoices(); } catch (e) { voices = []; } }
+if (canSpeak) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+
+function speak(text, rate, onend) {
+  if (!canSpeak) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = rate || 0.9;
+  const v = voices.find(v => v.lang === "en-US") || voices.find(v => v.lang && v.lang.startsWith("en"));
+  if (v) u.voice = v;
+  if (onend) { u.onend = onend; u.onerror = onend; }
+  speechSynthesis.speak(u);
+}
+function stopSpeak() {
+  if (canSpeak) speechSynthesis.cancel();
+  S.speaking = false;
+}
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+function goHome() {
+  stopSpeak();
+  S = { view: "home" };
+  render();
+  window.scrollTo({ top: 0 });
+}
+
+function startLesson(i) {
+  stopSpeak();
+  const L = LESSONS[i];
+  S = {
+    view: "lesson", li: i, step: 0, visited: new Set([0]),
+    hl: false, ko: false, note: null, speaking: false,
+    found: new Set(), findMistakes: 0, hints: 0,
+    quiz: L.quiz.map(q => ({ ...q, opts: shuffle(q.options) })),
+    qi: 0, answers: [], quizDone: false
+  };
+  render();
+  window.scrollTo({ top: 0 });
+}
+
+function goStep(n) {
+  if (n === 4 && !S.quizDone) return;
+  stopSpeak();
+  S.note = null;
+  S.step = n;
+  S.visited.add(n);
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function finishQuiz() {
+  const L = LESSONS[S.li];
+  const c = S.answers.filter(a => a && a.correct).length;
+  const n = S.quiz.length;
+  const stars = calcStars(c, n);
+  const prog = loadProg();
+  const prev = prog[L.id] || { stars: 0, best: 0 };
+  prog[L.id] = { stars: Math.max(prev.stars, stars), best: Math.max(prev.best, c) };
+  saveProg(prog);
+  S.quizDone = true;
+  goStep(4);
+}
+
+function retryQuiz() {
+  const L = LESSONS[S.li];
+  S.quiz = L.quiz.map(q => ({ ...q, opts: shuffle(q.options) }));
+  S.qi = 0;
+  S.answers = [];
+  S.quizDone = false;
+  S.visited.delete(4);
+  goStep(3);
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function render() {
+  if (S.view === "home") renderHome();
+  else renderLesson();
+}
+
+function renderHome() {
+  homeBtn.style.visibility = "hidden";
+  const prog = loadProg();
+  const total = LESSONS.reduce((a, l) => a + ((prog[l.id] && prog[l.id].stars) || 0), 0);
+  view.innerHTML = `
+    <section class="hero">
+      <h1>읽으며 배우는 영문법</h1>
+      <p>짧은 영어 글을 읽고, 글 속에 숨어 있는 문법 하나를 찾아서 익혀요.</p>
+      <div class="flow"><span>📖 읽기</span><span>💡 문법</span><span>🔍 찾기</span><span>✏️ 연습</span></div>
+    </section>
+    <div class="sec-head">
+      <h2>레슨 고르기</h2>
+      <span class="total"><span class="star-on">★</span> ${total} / ${LESSONS.length * 3}</span>
+    </div>
+    <div class="lesson-grid">
+      ${LESSONS.map((l, i) => {
+        const st = (prog[l.id] && prog[l.id].stars) || 0;
+        return `
+        <button class="lesson-card" data-lesson="${i}" style="--c:${l.color};--cbg:${l.color}1F">
+          <span class="bar"></span>
+          <div class="emoji">${l.emoji}</div>
+          <div class="lnum">Lesson ${i + 1}</div>
+          <div class="ltitle">${esc(l.title)}</div>
+          <span class="chip">${esc(l.grammar)}</span>
+          <div class="lko">${esc(l.grammarKo)}</div>
+          <div class="stars">${starHTML(st)}</div>
+        </button>`;
+      }).join("")}
+    </div>`;
+}
+
+function renderLesson() {
+  homeBtn.style.visibility = "visible";
+  const L = LESSONS[S.li];
+  let body = "";
+  if (S.step === 0) body = stepRead(L);
+  else if (S.step === 1) body = stepGrammar(L);
+  else if (S.step === 2) body = stepFind(L);
+  else if (S.step === 3) body = stepQuiz(L);
+  else body = stepResult(L);
+
+  view.innerHTML = `
+    <div class="lesson" style="--c:${L.color};--cbg:${L.color}1F">
+      <div class="lesson-head">
+        <div class="emoji">${L.emoji}</div>
+        <div>
+          <div class="lnum">Lesson ${S.li + 1} · ${esc(L.grammar)}</div>
+          <div class="ltitle">${esc(L.title)}</div>
+        </div>
+      </div>
+      <div class="stepper">
+        ${STEPS.map((s, i) => {
+          let cls = "step";
+          if (i === S.step) cls += " active";
+          else if (S.visited.has(i)) cls += " done";
+          if (i === 4 && !S.quizDone) cls += " locked";
+          return `<div class="${cls}" data-go="${i}"><span class="n">${i + 1}</span>${s}</div>`;
+        }).join("")}
+      </div>
+      ${body}
+    </div>`;
+}
+
+function noteHTML(L) {
+  if (S.note) return `<b>${esc(S.note.text)}</b> &nbsp;→&nbsp; ${esc(S.note.msg)}`;
+  if (S.hl) return "✨ 노란색 표현을 눌러서 문법 설명을 확인해 보세요.";
+  return "💡 단어를 누르면 발음을 들을 수 있어요. '문법 표시'를 켜면 오늘의 문법이 보여요.";
+}
+
+function stepRead(L) {
+  return `
+    <div class="card">
+      <div class="card-label">📖 STEP 1 · 읽기</div>
+      <h2 class="ptitle">${esc(L.title)}</h2>
+      <div class="controls">
+        ${canSpeak ? `<button class="btn ${S.speaking ? "on" : ""}" data-act="listen">${S.speaking ? "⏹ 멈추기" : "🔊 전체 듣기"}</button>` : ""}
+        <button class="btn ${S.hl ? "on" : ""}" data-act="hl">✨ 문법 표시</button>
+        <button class="btn ${S.ko ? "on" : ""}" data-act="ko">🇰🇷 해석</button>
+      </div>
+      <div class="passage" data-mode="read">${passageHTML("read")}</div>
+      ${S.ko ? `<div class="ko">${esc(L.ko)}</div>` : ""}
+      <div class="note" id="note">${noteHTML(L)}</div>
+    </div>
+    <div class="nav">
+      <span></span>
+      <button class="btn primary big" data-go="1">문법 배우기 →</button>
+    </div>`;
+}
+
+function stepGrammar(L) {
+  const r = L.rule;
+  const sentences = L.passage.split(/(?<=[.!?])\s+/).filter(s => s.includes("[[")).slice(0, 3);
+  return `
+    <div class="card">
+      <div class="card-label">💡 STEP 2 · 오늘의 문법</div>
+      <h2 class="ptitle">${esc(L.grammar)}</h2>
+      <p class="gko">${esc(L.grammarKo)}</p>
+      <div class="formula">${esc(r.formula)}</div>
+      <p class="summary">${esc(r.summary)}</p>
+      <div class="rules">
+        ${r.points.map(p => `
+          <div class="rule-row">
+            <div class="rlabel">${esc(p[0])}</div>
+            <div class="rform">${esc(p[1])}</div>
+            <div class="rex">${esc(p[2])}</div>
+          </div>`).join("")}
+      </div>
+      <div class="tip">🔔 ${esc(r.tip)}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">📌 글 속 예문</div>
+      <ul class="ex-list">
+        ${sentences.map(s => `
+          <li>
+            ${canSpeak ? `<button class="say" data-say="${esc(plain(s))}" aria-label="듣기">🔊</button>` : ""}
+            <span>${esc(s).replace(/\[\[(.*?)\]\]/g, "<mark>$1</mark>")}</span>
+          </li>`).join("")}
+      </ul>
+    </div>
+    <div class="nav">
+      <button class="btn ghost big" data-go="0">← 다시 읽기</button>
+      <button class="btn primary big" data-go="2">문법 찾기 →</button>
+    </div>`;
+}
+
+function stepFind(L) {
+  const { count } = parsePassage(L.passage);
+  const n = S.found.size;
+  const all = n === count;
+  return `
+    <div class="card">
+      <div class="card-label">🔍 STEP 3 · 문법 찾기</div>
+      <p class="guide">${esc(L.findGuide)}</p>
+      <div class="find-bar">
+        <div>
+          <div class="counter">찾은 개수 <b>${n}</b> / ${count}</div>
+          <div class="dots">${Array.from({ length: count }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" data-act="hint" ${all ? "disabled" : ""}>💡 힌트</button>
+          <button class="btn" data-act="resetFind" aria-label="처음부터">↺ 처음부터</button>
+        </div>
+      </div>
+      <div class="passage" data-mode="find">${passageHTML("find")}</div>
+      ${all ? `<div class="success">🎉 모두 찾았어요! (실수 ${S.findMistakes}번 · 힌트 ${S.hints}번)</div>` : ""}
+    </div>
+    <div class="nav">
+      <button class="btn ghost big" data-go="1">← 문법 다시 보기</button>
+      <button class="btn primary big" data-go="3">${all ? "연습 문제 →" : "건너뛰고 연습 →"}</button>
+    </div>`;
+}
+
+function stepQuiz(L) {
+  const q = S.quiz[S.qi];
+  const a = S.answers[S.qi];
+  const total = S.quiz.length;
+  const correctSoFar = S.answers.filter(x => x && x.correct).length;
+  const hasBlank = q.q.includes("___");
+  const qHTML = esc(q.q).replace("___", a ? `<span class="blank filled">${esc(q.answer)}</span>` : `<span class="blank">&nbsp;</span>`);
+  const fullSentence = hasBlank ? q.q.replace("___", q.answer) : q.answer;
+  const isLast = S.qi === total - 1;
+
+  return `
+    <div class="card">
+      <div class="card-label">✏️ STEP 4 · 연습 문제</div>
+      <div class="qhead"><span>Question ${S.qi + 1} / ${total}</span><span>✅ ${correctSoFar}</span></div>
+      <div class="qprog"><div style="width:${((S.qi + (a ? 1 : 0)) / total) * 100}%"></div></div>
+      <div class="question">${qHTML}</div>
+      <div class="opts">
+        ${q.opts.map(o => {
+          let cls = "opt";
+          if (a) {
+            if (o === q.answer) cls += " correct";
+            else if (o === a.picked) cls += " incorrect";
+          }
+          return `<button class="${cls}" data-opt="${esc(o)}" ${a ? "disabled" : ""}>${esc(o)}</button>`;
+        }).join("")}
+      </div>
+      ${a ? `
+        <div class="feedback ${a.correct ? "ok" : "bad"}">
+          <b>${a.correct ? "정답이에요! 🎉" : "아쉬워요! 정답은 " + esc(q.answer)}</b>
+          <p>${esc(q.explain)}</p>
+          <div class="full">
+            ${canSpeak ? `<button class="say" data-say="${esc(fullSentence)}" aria-label="듣기">🔊</button>` : ""}
+            <span>${esc(fullSentence)}</span>
+          </div>
+        </div>` : ""}
+    </div>
+    <div class="nav">
+      <button class="btn ghost big" data-go="2">← 문법 찾기</button>
+      ${a ? `<button class="btn primary big" data-act="next">${isLast ? "결과 보기 →" : "다음 문제 →"}</button>` : "<span></span>"}
+    </div>`;
+}
+
+function stepResult(L) {
+  const total = S.quiz.length;
+  const c = S.answers.filter(a => a && a.correct).length;
+  const stars = calcStars(c, total);
+  const msgs = ["다시 도전해 볼까요? 💪", "Good try! 조금만 더!", "Great job! 잘했어요!", "Excellent! 완벽해요!"];
+  const wrong = S.quiz.map((q, i) => ({ q, a: S.answers[i] })).filter(x => x.a && !x.a.correct);
+  const hasNext = S.li < LESSONS.length - 1;
+
+  return `
+    <div class="card result">
+      <div class="card-label">🏆 STEP 5 · 결과</div>
+      <div class="big-stars">${starHTML(stars)}</div>
+      <h2>${msgs[stars]}</h2>
+      <p class="score">${c} / ${total} 정답</p>
+      <p class="sub">문법 찾기: ${S.found.size} / ${parsePassage(L.passage).count}개 · 실수 ${S.findMistakes}번 · 힌트 ${S.hints}번</p>
+    </div>
+    ${wrong.length ? `
+    <div class="card">
+      <div class="card-label">📝 틀린 문제 다시 보기</div>
+      <ul class="review">
+        ${wrong.map(x => `
+          <li>
+            <div class="q">${esc(x.q.q)}</div>
+            <div>내 답: <span class="mine">${esc(x.a.picked)}</span> → 정답: <span class="ans">${esc(x.q.answer)}</span></div>
+            <div style="color:var(--muted);font-weight:600">${esc(x.q.explain)}</div>
+          </li>`).join("")}
+      </ul>
+    </div>` : ""}
+    <div class="result-actions">
+      <button class="btn ghost big" data-act="retry">↺ 다시 풀기</button>
+      <button class="btn ghost big" data-go="0">📖 글 다시 읽기</button>
+      ${hasNext
+        ? `<button class="btn primary big" data-act="nextLesson">다음 레슨 →</button>`
+        : `<button class="btn primary big" data-act="home">레슨 목록 🏠</button>`}
+    </div>`;
+}
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+homeBtn.addEventListener("click", goHome);
+
+document.addEventListener("click", e => {
+  const lessonCard = e.target.closest("[data-lesson]");
+  if (lessonCard) { startLesson(Number(lessonCard.dataset.lesson)); return; }
+
+  const goEl = e.target.closest("[data-go]");
+  if (goEl) { goStep(Number(goEl.dataset.go)); return; }
+
+  const sayEl = e.target.closest("[data-say]");
+  if (sayEl) { S.speaking = false; speak(sayEl.dataset.say, 0.85); return; }
+
+  const optEl = e.target.closest("[data-opt]");
+  if (optEl && !optEl.disabled) {
+    const q = S.quiz[S.qi];
+    if (S.answers[S.qi]) return;
+    const picked = optEl.dataset.opt;
+    S.answers[S.qi] = { picked, correct: picked === q.answer };
+    render();
+    return;
+  }
+
+  const actEl = e.target.closest("[data-act]");
+  if (actEl && !actEl.disabled) { handleAct(actEl.dataset.act); return; }
+
+  const word = e.target.closest(".passage .w");
+  if (word) { handleWord(word); return; }
+});
+
+function handleAct(act) {
+  const L = S.view === "lesson" ? LESSONS[S.li] : null;
+  switch (act) {
+    case "listen":
+      if (S.speaking) { stopSpeak(); render(); }
+      else {
+        S.speaking = true;
+        render();
+        speak(plain(L.passage), 0.85, () => {
+          if (S.view === "lesson" && S.speaking) { S.speaking = false; if (S.step === 0) render(); }
+        });
+      }
+      break;
+    case "hl":
+      S.hl = !S.hl;
+      S.note = null;
+      render();
+      break;
+    case "ko":
+      S.ko = !S.ko;
+      render();
+      break;
+    case "hint": {
+      const { count } = parsePassage(L.passage);
+      let target = -1;
+      for (let i = 0; i < count; i++) if (!S.found.has(i)) { target = i; break; }
+      if (target < 0) return;
+      S.hints++;
+      const el = view.querySelector(`.passage [data-t="${target}"]`);
+      if (el) {
+        el.classList.remove("hint");
+        void el.offsetWidth;
+        el.classList.add("hint");
+        setTimeout(() => el.classList.remove("hint"), 2300);
+      }
+      break;
+    }
+    case "resetFind":
+      S.found = new Set();
+      S.findMistakes = 0;
+      S.hints = 0;
+      render();
+      break;
+    case "next":
+      if (S.qi < S.quiz.length - 1) { S.qi++; render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+      else finishQuiz();
+      break;
+    case "retry":
+      retryQuiz();
+      break;
+    case "nextLesson":
+      startLesson(S.li + 1);
+      break;
+    case "home":
+      goHome();
+      break;
+  }
+}
+
+function handleWord(el) {
+  const L = LESSONS[S.li];
+  const mode = el.closest(".passage").dataset.mode;
+  const isTarget = el.hasAttribute("data-t");
+  const text = el.dataset.w;
+
+  if (mode === "read") {
+    S.speaking = false;
+    speak(text, 0.8);
+    if (isTarget && S.hl) {
+      S.note = { text, msg: L.notes[text.toLowerCase()] || "" };
+      const box = document.getElementById("note");
+      if (box) box.innerHTML = noteHTML(L);
+    }
+    const btn = view.querySelector('[data-act="listen"]');
+    if (btn) { btn.classList.remove("on"); btn.textContent = "🔊 전체 듣기"; }
+    return;
+  }
+
+  if (mode === "find") {
+    if (isTarget) {
+      const idx = Number(el.dataset.t);
+      if (S.found.has(idx)) return;
+      S.found.add(idx);
+      speak(text, 0.85);
+      render();
+    } else {
+      S.findMistakes++;
+      el.classList.remove("wrong");
+      void el.offsetWidth;
+      el.classList.add("wrong");
+      setTimeout(() => el.classList.remove("wrong"), 450);
+    }
+  }
+}
+
+render();
+</script>
+</body>
+</html>
